@@ -11,7 +11,7 @@ const NAV = [
   { to: "/settings", label: "הגדרות", icon: Settings },
 ] as const;
 
-export function AppShell() {
+export function AppShell({ children }: { children: ReactNode }) {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div dir="rtl" className="min-h-screen flex flex-col bg-background text-foreground">
