@@ -50,7 +50,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </ul>
         </nav>
         <main className="flex-1 min-w-0 overflow-auto">
-          <Outlet />
+          {children}
         </main>
       </div>
       {/* Mobile bottom nav */}
