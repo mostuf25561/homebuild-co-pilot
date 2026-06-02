@@ -1,4 +1,5 @@
-import { Link, Outlet, useRouterState } from "@tanstack/react-router";
+import { Link, useRouterState } from "@tanstack/react-router";
+import type { ReactNode } from "react";
 import { HardHat, MessageSquare, Target, GitBranch, Settings } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImportExportPanel } from "./ImportExportPanel";
