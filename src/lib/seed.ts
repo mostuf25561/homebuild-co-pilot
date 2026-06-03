@@ -45,6 +45,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "CRITICAL",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-03T12:00:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-302",
@@ -55,6 +56,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "HIGH",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-05T16:00:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-303",
@@ -65,6 +67,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "HIGH",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-07T11:00:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-304",
@@ -75,6 +78,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "HIGH",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-05T00:00:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-305",
@@ -85,6 +89,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "LOW",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-15T00:00:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-306",
@@ -95,6 +100,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "HIGH",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-06T08:00:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-307",
@@ -105,6 +111,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "MEDIUM",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-04T20:00:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-308",
@@ -115,6 +122,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "HIGH",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-06T07:30:00Z",
+      relations: [],
     },
     {
       Task_ID: "TSK-309",
@@ -125,6 +133,7 @@ export const SEED: AppState = {
       AI_Urgency_Level: "HIGH",
       Snooze_Counter: 0,
       Re_Evaluate_Timestamp: "2026-06-04T18:00:00Z",
+      relations: [],
     },
   ],
   decisions: [
@@ -182,6 +191,8 @@ export const SEED: AppState = {
   settings: {
     openrouter_api_key: "",
     model_route: "openrouter/auto:free",
+    theme: "light",
+    ui_collapsed: {},
     system_prompt:
       "You are 'HomeBuild Co-Pilot', a defensive, high-accountability AI supervisor for an owner-builder. Default language for interaction is Hebrew (RTL). Assume official site managers and inspectors are prone to oversights. Intercept upcoming construction milestones. Force verification workflows. When the user faces critical-path item bottlenecks, do not allow vague text inputs; present structural Yes/No/Delay choices. Rely strictly on Data State changes rather than raw conversation logs to alter timeline pipelines.",
   },

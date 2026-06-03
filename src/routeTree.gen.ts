@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as ObjectivesRouteImport } from './routes/objectives'
+import { Route as GraphRouteImport } from './routes/graph'
 import { Route as DecisionsRouteImport } from './routes/decisions'
 import { Route as CopilotRouteImport } from './routes/copilot'
 import { Route as IndexRouteImport } from './routes/index'
@@ -23,6 +24,11 @@ const SettingsRoute = SettingsRouteImport.update({
 const ObjectivesRoute = ObjectivesRouteImport.update({
   id: '/objectives',
   path: '/objectives',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const GraphRoute = GraphRouteImport.update({
+  id: '/graph',
+  path: '/graph',
   getParentRoute: () => rootRouteImport,
 } as any)
 const DecisionsRoute = DecisionsRouteImport.update({
@@ -45,6 +51,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/copilot': typeof CopilotRoute
   '/decisions': typeof DecisionsRoute
+  '/graph': typeof GraphRoute
   '/objectives': typeof ObjectivesRoute
   '/settings': typeof SettingsRoute
 }
@@ -52,6 +59,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/copilot': typeof CopilotRoute
   '/decisions': typeof DecisionsRoute
+  '/graph': typeof GraphRoute
   '/objectives': typeof ObjectivesRoute
   '/settings': typeof SettingsRoute
 }
@@ -60,21 +68,36 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/copilot': typeof CopilotRoute
   '/decisions': typeof DecisionsRoute
+  '/graph': typeof GraphRoute
   '/objectives': typeof ObjectivesRoute
   '/settings': typeof SettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/copilot' | '/decisions' | '/objectives' | '/settings'
+  fullPaths:
+    | '/'
+    | '/copilot'
+    | '/decisions'
+    | '/graph'
+    | '/objectives'
+    | '/settings'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/copilot' | '/decisions' | '/objectives' | '/settings'
-  id: '__root__' | '/' | '/copilot' | '/decisions' | '/objectives' | '/settings'
+  to: '/' | '/copilot' | '/decisions' | '/graph' | '/objectives' | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/copilot'
+    | '/decisions'
+    | '/graph'
+    | '/objectives'
+    | '/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CopilotRoute: typeof CopilotRoute
   DecisionsRoute: typeof DecisionsRoute
+  GraphRoute: typeof GraphRoute
   ObjectivesRoute: typeof ObjectivesRoute
   SettingsRoute: typeof SettingsRoute
 }
@@ -93,6 +116,13 @@ declare module '@tanstack/react-router' {
       path: '/objectives'
       fullPath: '/objectives'
       preLoaderRoute: typeof ObjectivesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/graph': {
+      id: '/graph'
+      path: '/graph'
+      fullPath: '/graph'
+      preLoaderRoute: typeof GraphRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/decisions': {
@@ -123,19 +153,10 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CopilotRoute: CopilotRoute,
   DecisionsRoute: DecisionsRoute,
+  GraphRoute: GraphRoute,
   ObjectivesRoute: ObjectivesRoute,
   SettingsRoute: SettingsRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}

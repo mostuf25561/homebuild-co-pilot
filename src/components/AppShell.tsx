@@ -1,17 +1,21 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import type { ReactNode } from "react";
-import { HardHat, MessageSquare, Target, GitBranch, Settings } from "lucide-react";
+import { HardHat, MessageSquare, Target, GitBranch, Settings, Network } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImportExportPanel } from "./ImportExportPanel";
+import { ThemeSwitcher, useApplyTheme } from "./ThemeSwitcher";
+import { ReturnButton } from "./ReturnButton";
 
 const NAV = [
   { to: "/copilot", label: "צ'אט פיקוח", icon: MessageSquare },
+  { to: "/graph", label: "מפת משימות", icon: Network },
   { to: "/objectives", label: "מטרות ורצונות", icon: Target },
   { to: "/decisions", label: "עץ החלטות", icon: GitBranch },
   { to: "/settings", label: "הגדרות", icon: Settings },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
+  useApplyTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
   return (
     <div dir="rtl" className="min-h-screen flex flex-col bg-background text-foreground">
@@ -21,7 +25,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             <HardHat className="size-6 text-primary" />
             <span>HomeBuild Co-Pilot</span>
           </Link>
-          <ImportExportPanel />
+          <div className="flex items-center gap-3">
+            <ThemeSwitcher />
+            <ImportExportPanel />
+          </div>
         </div>
       </header>
       <div className="flex flex-1 min-h-0">
@@ -49,12 +56,10 @@ export function AppShell({ children }: { children: ReactNode }) {
             })}
           </ul>
         </nav>
-        <main className="flex-1 min-w-0 overflow-auto">
-          {children}
-        </main>
+        <main className="flex-1 min-w-0 overflow-auto">{children}</main>
       </div>
       {/* Mobile bottom nav */}
-      <nav className="md:hidden border-t bg-card grid grid-cols-4">
+      <nav className="md:hidden border-t bg-card grid grid-cols-5">
         {NAV.map((n) => {
           const active = pathname.startsWith(n.to);
           const Icon = n.icon;
@@ -63,7 +68,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               key={n.to}
               to={n.to}
               className={cn(
-                "flex flex-col items-center gap-1 py-2 text-xs",
+                "flex flex-col items-center gap-1 py-2 text-[11px]",
                 active ? "text-primary" : "text-muted-foreground",
               )}
             >
@@ -73,6 +78,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
+      <ReturnButton />
     </div>
   );
 }
