@@ -266,10 +266,8 @@ export const useStore = create<AppState & TransientState & AppActions>()(
       },
       onRehydrateStorage: () => (state) => {
         if (!state) return;
-        // Ensure default settings keys exist after migration from older versions
         state.settings = {
-          theme: "light",
-          ui_collapsed: {},
+          ...{ theme: "light" as ThemeMode, ui_collapsed: {} },
           ...state.settings,
         };
         state.tasks = state.tasks.map(normalizeTask);
