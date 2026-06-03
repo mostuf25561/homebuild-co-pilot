@@ -80,7 +80,7 @@ function DecisionNode({ decision }: { decision: Decision }) {
   const isPending = /ממתין/.test(decision.Final_Choice_Made);
 
   // Try to split rationale into short / long pieces if formatted that way.
-  const txt = decision.Rationale_Short_vs_Long_Term;
+  const txt = decision.Rationale_Short_vs_Long_Term || "";
   const shortMatch = txt.match(/טווח קצר[:：]?\s*([^.]+?\.?)(?=\s*טווח ארוך|$)/);
   const longMatch = txt.match(/טווח ארוך[:：]?\s*(.+)$/);
 

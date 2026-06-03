@@ -131,7 +131,7 @@ function normalizeTask(t: Partial<Task>): Task {
     Task_ID: t.Task_ID || genId("TSK"),
     Description: t.Description || "",
     Status: t.Status || "Pending",
-    Blocked_By_Task_ID: t.Blocked_By_Task_ID || "NONE",
+    Blocked_By_Task_ID: "NONE",
     AI_Urgency_Level: t.AI_Urgency_Level || "MEDIUM",
     Snooze_Counter: t.Snooze_Counter ?? 0,
     Re_Evaluate_Timestamp: t.Re_Evaluate_Timestamp || new Date().toISOString(),
@@ -170,7 +170,14 @@ export const useStore = create<AppState & TransientState & AppActions>()(
           tasks: s.tasks.map((t) => (t.Task_ID === id ? { ...t, ...patch } : t)),
         })),
       addTask: (t) => set((s) => ({ tasks: [...s.tasks, normalizeTask(t)] })),
-      deleteTask: (id) => set((s) => ({ tasks: s.tasks.filter((t) => t.Task_ID !== id) })),
+      deleteTask: (id) => set((s) => ({
+        tasks: s.tasks
+          .filter((t) => t.Task_ID !== id)
+          .map((t) => ({
+            ...t,
+            relations: t.relations.filter((r) => r.task_id !== id),
+          })),
+      })),
       snoozeTask: (id, hours = 24) =>
         set((s) => ({
           tasks: s.tasks.map((t) =>
@@ -258,7 +265,8 @@ export const useStore = create<AppState & TransientState & AppActions>()(
       },
       pushReturn: (e) => set((s) => ({ return_stack: [...s.return_stack, e] })),
       popReturn: () => {
-        const stack = get().return_stack;
+        const s = get();
+        const stack = s.return_stack;
         if (stack.length === 0) return undefined;
         const top = stack[stack.length - 1];
         set({ return_stack: stack.slice(0, -1) });

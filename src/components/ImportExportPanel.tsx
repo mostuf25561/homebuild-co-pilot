@@ -22,7 +22,10 @@ export function ImportExportPanel() {
   const onImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!confirm("ייבוא יחליף את כל הנתונים הקיימים. להמשיך?")) return;
+    if (!confirm("ייבוא יחליף את כל הנתונים הקיימים. להמשיך?")) {
+      if (fileRef.current) fileRef.current.value = "";
+      return;
+    }
     const text = await file.text();
     try {
       const parsed = JSON.parse(text);
@@ -30,8 +33,9 @@ export function ImportExportPanel() {
       alert("הנתונים יובאו בהצלחה");
     } catch {
       alert("קובץ JSON לא תקין");
+    } finally {
+      if (fileRef.current) fileRef.current.value = "";
     }
-    if (fileRef.current) fileRef.current.value = "";
   };
 
   return (

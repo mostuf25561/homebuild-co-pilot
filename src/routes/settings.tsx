@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Eye, EyeOff, Check } from "lucide-react";
+import { Eye, EyeOff, Check, TriangleAlert as AlertTriangle } from "lucide-react";
 
 export const Route = createFileRoute("/settings")({
   component: () => (
@@ -31,10 +31,16 @@ function SettingsPage() {
   const [saved, setSaved] = useState(false);
 
   const save = () => {
+    if (!draft.openrouter_api_key.trim()) {
+      alert("מפתח API נדרש לעבודת ה-AI");
+      return;
+    }
     setSettings(draft);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
   };
+
+  const isKeyMissing = !draft.openrouter_api_key.trim();
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-2xl">
@@ -56,11 +62,18 @@ function SettingsPage() {
               onChange={(e) => setDraft({ ...draft, openrouter_api_key: e.target.value })}
               placeholder="sk-or-v1-..."
               dir="ltr"
+              className={isKeyMissing ? "border-destructive" : ""}
             />
             <Button size="icon" variant="outline" onClick={() => setShow((v) => !v)}>
               {show ? <EyeOff /> : <Eye />}
             </Button>
           </div>
+          {isKeyMissing && (
+            <div className="flex items-center gap-2 text-xs text-destructive mt-1.5">
+              <AlertTriangle className="size-3" />
+              מפתח API נדרש להפעלת AI
+            </div>
+          )}
           <p className="text-xs text-muted-foreground mt-1.5">
             השג מפתח חינמי ב-
             <a href="https://openrouter.ai/keys" target="_blank" rel="noreferrer" className="underline text-primary">
@@ -106,8 +119,11 @@ function SettingsPage() {
       </Card>
 
       <div className="flex items-center gap-3">
-        <Button onClick={save}><Check /> שמור הגדרות</Button>
-        {saved && <span className="text-sm text-low-foreground">נשמר ✓</span>}
+        <Button onClick={save} disabled={isKeyMissing}>
+          <Check /> שמור הגדרות
+        </Button>
+        {saved && <span className="text-sm text-muted-foreground">נשמר ✓</span>}
+        {isKeyMissing && <span className="text-sm text-destructive">מפתח API חובה</span>}
       </div>
     </div>
   );

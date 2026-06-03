@@ -52,8 +52,8 @@ function AlertsRail() {
   const sorted = [...tasks]
     .filter((t) => t.Status !== "DONE" && t.Status !== "CANCELLED")
     .sort((a, b) => {
-      const order = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
-      const pa = order[a.AI_Urgency_Level] - order[b.AI_Urgency_Level];
+      const order: Record<string, number> = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+      const pa = (order[a.AI_Urgency_Level] ?? 999) - (order[b.AI_Urgency_Level] ?? 999);
       if (pa !== 0) return pa;
       return new Date(a.Re_Evaluate_Timestamp).getTime() - new Date(b.Re_Evaluate_Timestamp).getTime();
     });
@@ -179,10 +179,10 @@ function ChatPanel() {
     const text = input.trim();
     if (!text || loading) return;
     setError(null);
+    setLoading(true);
     const userMsg = { id: crypto.randomUUID(), role: "user" as const, content: text, timestamp: new Date().toISOString() };
     addMessage(userMsg);
     setInput("");
-    setLoading(true);
     try {
       const history = messages.map((m) => ({ role: m.role, content: m.content }));
       const reply = await callOpenRouter(text, history);
