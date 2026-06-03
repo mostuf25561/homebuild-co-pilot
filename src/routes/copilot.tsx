@@ -5,11 +5,26 @@ import { useStore, type Task } from "@/lib/store";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Card } from "@/components/ui/card";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { StatusPill } from "@/components/StatusPill";
 import { AppShell } from "@/components/AppShell";
+import { TaskRelationsEditor } from "@/components/TaskRelationsEditor";
 import { callOpenRouter, extractActions, applyActions } from "@/lib/openrouter";
-import { AlertTriangle, Send, Check, X, Clock, Flag, Loader2 } from "lucide-react";
+import {
+  AlertTriangle,
+  Send,
+  Check,
+  X,
+  Clock,
+  Flag,
+  Loader2,
+  ChevronDown,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/copilot")({
