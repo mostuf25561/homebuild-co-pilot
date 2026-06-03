@@ -14,17 +14,10 @@ import { PriorityBadge } from "@/components/PriorityBadge";
 import { StatusPill } from "@/components/StatusPill";
 import { AppShell } from "@/components/AppShell";
 import { TaskRelationsEditor } from "@/components/TaskRelationsEditor";
+import { TaskEditor } from "@/components/TaskEditor";
+import { QuickAIMenu } from "@/components/QuickAIMenu";
 import { callOpenRouter, extractActions, applyActions } from "@/lib/openrouter";
-import {
-  AlertTriangle,
-  Send,
-  Check,
-  X,
-  Clock,
-  Flag,
-  Loader2,
-  ChevronDown,
-} from "lucide-react";
+import { TriangleAlert as AlertTriangle, Send, Check, X, Clock, Flag, Loader as Loader2, ChevronDown, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/copilot")({
@@ -38,7 +31,10 @@ export const Route = createFileRoute("/copilot")({
 function CopilotPage() {
   return (
     <div className="grid lg:grid-cols-[1fr_380px] gap-4 p-4 min-h-full">
-      <ChatPanel />
+      <div className="space-y-4">
+        <QuickAIMenu />
+        <ChatPanel />
+      </div>
       <AlertsRail />
     </div>
   );
@@ -153,6 +149,7 @@ function AlertsRail() {
                       >
                         <Flag />
                       </Button>
+                      <TaskEditor task={t} />
                     </div>
                   </>
                 )}

@@ -39,6 +39,12 @@ const ActionSchema = z.discriminatedUnion("type", [
 export type Action = z.infer<typeof ActionSchema>;
 
 export function buildSystemPrompt(state: AppState): string {
+  const recentActions = useStore.getState().getActionHistory().slice(-10);
+  const actionSummary =
+    recentActions.length > 0
+      ? `Recent user actions:\n${recentActions.map((a) => `- ${a.action}: ${a.description}`).join("\n")}`
+      : "No recent user actions.";
+
   const snapshot = {
     objectives: state.objectives,
     tasks: state.tasks,
@@ -46,6 +52,9 @@ export function buildSystemPrompt(state: AppState): string {
     advice: state.advice,
   };
   return `${state.settings.system_prompt}
+
+User's Recent Activity:
+${actionSummary}
 
 You MUST reply in Hebrew. After your natural-language reply, if any state change is needed, append a single fenced JSON code block exactly like:
 \`\`\`json
@@ -83,28 +92,63 @@ export function extractActions(text: string): { cleanText: string; actions: Acti
 export function applyActions(actions: Action[]): string[] {
   const s = useStore.getState();
   const log: string[] = [];
+
   for (const a of actions) {
     switch (a.type) {
-      case "add_task":
-        s.addTask({
+      case "add_task": {
+        const task = s.addTask({
           Description: a.description,
           AI_Urgency_Level: a.urgency || "MEDIUM",
           Blocked_By_Task_ID: a.blocked_by || "NONE",
         });
         log.push(`נוספה משימה: ${a.description}`);
+        s.recordAction("add_task", `נוספה משימה: ${a.description}`);
         break;
-      case "update_task":
-        s.updateTask(a.task_id, a.patch as never);
+      }
+      case "update_task": {
+        const taskExists = s.tasks.some((t) => t.Task_ID === a.task_id);
+        if (!taskExists) {
+          log.push(`שגיאה: משימה ${a.task_id} לא קיימת`);
+          continue;
+        }
+        const validKeys = [
+          "Description",
+          "Status",
+          "AI_Urgency_Level",
+          "Snooze_Counter",
+          "Re_Evaluate_Timestamp",
+          "relations",
+        ];
+        const sanitized = Object.fromEntries(
+          Object.entries(a.patch).filter(([k]) => validKeys.includes(k)),
+        );
+        s.updateTask(a.task_id, sanitized);
         log.push(`עודכנה משימה ${a.task_id}`);
+        s.recordAction("update_task", `עודכנה משימה ${a.task_id}`);
         break;
-      case "flag_task":
+      }
+      case "flag_task": {
+        const taskExists = s.tasks.some((t) => t.Task_ID === a.task_id);
+        if (!taskExists) {
+          log.push(`שגיאה: משימה ${a.task_id} לא קיימת`);
+          continue;
+        }
         s.updateTask(a.task_id, { Status: "Flagged_Risk" });
         log.push(`סומנה כסיכון: ${a.task_id}`);
+        s.recordAction("flag_task", `סומנה כסיכון: ${a.task_id}`);
         break;
-      case "snooze_task":
+      }
+      case "snooze_task": {
+        const taskExists = s.tasks.some((t) => t.Task_ID === a.task_id);
+        if (!taskExists) {
+          log.push(`שגיאה: משימה ${a.task_id} לא קיימת`);
+          continue;
+        }
         s.snoozeTask(a.task_id, a.hours);
         log.push(`נדחתה משימה ${a.task_id}`);
+        s.recordAction("snooze_task", `נדחתה משימה ${a.task_id}`);
         break;
+      }
       case "add_decision":
         s.addDecision({
           Topic: a.topic,
@@ -112,6 +156,7 @@ export function applyActions(actions: Action[]): string[] {
           Rationale_Short_vs_Long_Term: a.rationale,
         });
         log.push(`נוספה החלטה: ${a.topic}`);
+        s.recordAction("add_decision", `נוספה החלטה: ${a.topic}`);
         break;
       case "add_objective":
         s.addObjective({
@@ -120,6 +165,7 @@ export function applyActions(actions: Action[]): string[] {
           Priority_Level: a.priority || "MEDIUM",
         });
         log.push(`נוספה מטרה: ${a.goal}`);
+        s.recordAction("add_objective", `נוספה מטרה: ${a.goal}`);
         break;
     }
   }

@@ -54,6 +54,12 @@ export interface ChatMessage {
   content: string;
   timestamp: string;
 }
+export interface ActionHistoryEntry {
+  timestamp: string;
+  action: string;
+  description: string;
+}
+
 export interface Settings {
   openrouter_api_key: string;
   model_route: string;
@@ -80,6 +86,7 @@ export interface AppState {
 
 interface TransientState {
   return_stack: ReturnStackEntry[];
+  action_history: ActionHistoryEntry[];
 }
 
 interface AppActions {
@@ -104,6 +111,8 @@ interface AppActions {
   pushReturn: (e: ReturnStackEntry) => void;
   popReturn: () => ReturnStackEntry | undefined;
   clearReturnStack: () => void;
+  recordAction: (action: string, description: string) => void;
+  getActionHistory: () => ActionHistoryEntry[];
 }
 
 const genId = (prefix: string) =>
@@ -136,6 +145,7 @@ export const useStore = create<AppState & TransientState & AppActions>()(
       ...SEED,
       tasks: SEED.tasks.map(normalizeTask),
       return_stack: [],
+      action_history: [],
       updateObjective: (id, patch) =>
         set((s) => ({
           objectives: s.objectives.map((o) => (o.Objective_ID === id ? { ...o, ...patch } : o)),
@@ -232,7 +242,7 @@ export const useStore = create<AppState & TransientState & AppActions>()(
           tasks: (state.tasks || s.tasks).map(normalizeTask),
         })),
       resetToSeed: () =>
-        set(() => ({ ...SEED, tasks: SEED.tasks.map(normalizeTask), return_stack: [] })),
+        set(() => ({ ...SEED, tasks: SEED.tasks.map(normalizeTask), return_stack: [], action_history: [] })),
       exportJSON: () => {
         const s = get();
         const out: AppState = {
@@ -255,13 +265,25 @@ export const useStore = create<AppState & TransientState & AppActions>()(
         return top;
       },
       clearReturnStack: () => set({ return_stack: [] }),
+      recordAction: (action, description) =>
+        set((s) => ({
+          action_history: [
+            ...s.action_history,
+            {
+              timestamp: new Date().toISOString(),
+              action,
+              description,
+            },
+          ].slice(-50),
+        })),
+      getActionHistory: () => get().action_history,
     }),
     {
       name: "homebuild:v1",
-      // Don't persist the return stack (UI session-only)
       partialize: (s) => {
-        const { return_stack, ...rest } = s as AppState & TransientState & AppActions;
+        const { return_stack, action_history, ...rest } = s as AppState & TransientState & AppActions;
         void return_stack;
+        void action_history;
         return rest;
       },
       onRehydrateStorage: () => (state) => {
@@ -272,6 +294,7 @@ export const useStore = create<AppState & TransientState & AppActions>()(
         };
         state.tasks = state.tasks.map(normalizeTask);
         state.return_stack = [];
+        state.action_history = [];
       },
     },
   ),

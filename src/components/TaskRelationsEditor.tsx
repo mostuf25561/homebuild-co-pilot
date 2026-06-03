@@ -1,6 +1,5 @@
 import { useState, useMemo } from "react";
 import { useStore, type Task, type RelationKind } from "@/lib/store";
-import { useNavigate, useRouterState } from "@tanstack/react-router";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Link2, X, ArrowLeft, ArrowRight, GitBranch, Plus } from "lucide-react";
@@ -16,9 +15,7 @@ export function TaskRelationsEditor({ task }: { task: Task }) {
   const allTasks = useStore((s) => s.tasks);
   const addRelation = useStore((s) => s.addRelation);
   const removeRelation = useStore((s) => s.removeRelation);
-  const pushReturn = useStore((s) => s.pushReturn);
-  const navigate = useNavigate();
-  const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const recordAction = useStore((s) => s.recordAction);
 
   const [query, setQuery] = useState("");
   const [kind, setKind] = useState<RelationKind>("before");
@@ -34,15 +31,6 @@ export function TaskRelationsEditor({ task }: { task: Task }) {
 
   const taskById = (id: string) => allTasks.find((t) => t.Task_ID === id);
 
-  const goTo = (otherId: string) => {
-    pushReturn({
-      route: pathname,
-      task_id: task.Task_ID,
-      label: task.Description.slice(0, 60),
-    });
-    navigate({ to: "/graph", search: { focus: otherId } as never });
-  };
-
   return (
     <div className="space-y-2">
       <div className="flex flex-wrap gap-1.5">
@@ -53,22 +41,21 @@ export function TaskRelationsEditor({ task }: { task: Task }) {
           const other = taskById(rel.task_id);
           const meta = KIND_META[rel.kind];
           const Icon = meta.icon;
-          const name = other?.Description.slice(0, 40) || rel.task_id;
+          const name = other?.Description || `[${rel.task_id}]`;
           return (
             <span
               key={`${rel.kind}-${rel.task_id}`}
               className={cn("inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs", meta.cls)}
             >
               <Icon className="size-3" />
-              <button
-                onClick={() => goTo(rel.task_id)}
-                className="underline-offset-2 hover:underline font-medium"
-                title={other?.Description}
-              >
+              <span className="font-medium" title={other?.Description}>
                 {name}
-              </button>
+              </span>
               <button
-                onClick={() => removeRelation(task.Task_ID, rel.task_id, rel.kind)}
+                onClick={() => {
+                  removeRelation(task.Task_ID, rel.task_id, rel.kind);
+                  recordAction("remove_relation", `הסרת קישור בין ${task.Task_ID} ל־${rel.task_id}`);
+                }}
                 className="opacity-60 hover:opacity-100"
                 title="הסרת קישור"
               >
@@ -112,6 +99,7 @@ export function TaskRelationsEditor({ task }: { task: Task }) {
                     className="w-full text-start text-xs px-2 py-1.5 hover:bg-muted flex items-center gap-1.5"
                     onClick={() => {
                       addRelation(task.Task_ID, { kind, task_id: c.Task_ID });
+                      recordAction("add_relation", `הוספת קישור ${kind} בין ${task.Task_ID} ל־${c.Task_ID}`);
                       setQuery("");
                       setOpen(false);
                     }}
