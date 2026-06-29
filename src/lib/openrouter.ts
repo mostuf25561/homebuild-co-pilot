@@ -45,13 +45,27 @@ export function buildSystemPrompt(state: AppState): string {
       ? `Recent user actions:\n${recentActions.map((a) => `- ${a.action}: ${a.description}`).join("\n")}`
       : "No recent user actions.";
 
+  // Append addendums from active plugin
+  const { findPlugin } = await import("@/plugins/registry").catch(() => ({ findPlugin: () => undefined }));
+  void findPlugin;
+  let addendum = "";
+  if (state.active_plugin_id) {
+    try {
+      const reg = require("@/plugins/registry");
+      const p = reg.findPlugin?.(state.active_plugin_id);
+      if (p?.ai_prompt_addendum) addendum = `\n\nActive plugin context: ${p.ai_prompt_addendum}`;
+    } catch {
+      /* ignore */
+    }
+  }
+
   const snapshot = {
     objectives: state.objectives,
     tasks: state.tasks,
     decisions: state.decisions,
     advice: state.advice,
   };
-  return `${state.settings.system_prompt}
+  return `${state.settings.system_prompt}${addendum}
 
 User's Recent Activity:
 ${actionSummary}
