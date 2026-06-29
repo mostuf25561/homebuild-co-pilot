@@ -136,3 +136,9 @@
     font-family: var(--font-sans);
   }
 }
+
+@keyframes breathe {
+  0%, 100% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+.animate-breathe { animation: breathe 4s ease-in-out infinite; }
