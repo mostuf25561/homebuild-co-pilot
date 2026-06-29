@@ -8,9 +8,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { PriorityBadge } from "@/components/PriorityBadge";
 import { StatusPill } from "@/components/StatusPill";
-import { Plus, Trash2, Pencil, Check } from "lucide-react";
+import { Plus, Trash2, Pencil, Check, X } from "lucide-react";
+
+interface ObjectivesSearch {
+  category?: string;
+}
 
 export const Route = createFileRoute("/objectives")({
+  validateSearch: (s: Record<string, unknown>): ObjectivesSearch => ({
+    category: typeof s.category === "string" ? s.category : undefined,
+  }),
   component: () => (
     <AppShell>
       <ObjectivesPage />
@@ -21,19 +28,22 @@ export const Route = createFileRoute("/objectives")({
 const PRIORITIES: Priority[] = ["CRITICAL", "HIGH", "MEDIUM", "LOW"];
 
 function ObjectivesPage() {
+  const { category } = Route.useSearch();
+  const navigate = Route.useNavigate();
   const objectives = useStore((s) => s.objectives);
   const addObjective = useStore((s) => s.addObjective);
   const [adding, setAdding] = useState(false);
   const [newObj, setNewObj] = useState({ Category: "", The_Goal: "", Priority_Level: "MEDIUM" as Priority });
 
-  const grouped = objectives.reduce<Record<string, Objective[]>>((acc, o) => {
+  const filtered = category ? objectives.filter((o) => o.Category === category) : objectives;
+  const grouped = filtered.reduce<Record<string, Objective[]>>((acc, o) => {
     (acc[o.Category] ||= []).push(o);
     return acc;
   }, {});
 
   return (
     <div className="p-4 md:p-6 space-y-6 max-w-5xl">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between flex-wrap gap-3">
         <div>
           <h1 className="text-2xl font-extrabold">מטרות ורצונות לפי קטגוריה</h1>
           <p className="text-sm text-muted-foreground mt-1">
@@ -44,6 +54,18 @@ function ObjectivesPage() {
           <Plus /> מטרה חדשה
         </Button>
       </div>
+
+      {category && (
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted-foreground">מסונן:</span>
+          <span className="text-sm px-2 py-1 rounded-full bg-primary/10 text-primary font-medium flex items-center gap-2">
+            {category}
+            <button onClick={() => navigate({ search: {} })} className="opacity-70 hover:opacity-100">
+              <X className="size-3" />
+            </button>
+          </span>
+        </div>
+      )}
 
       {adding && (
         <Card className="p-4 space-y-3 border-primary">
@@ -88,6 +110,10 @@ function ObjectivesPage() {
           </div>
         </section>
       ))}
+
+      {Object.keys(grouped).length === 0 && (
+        <p className="text-sm text-muted-foreground text-center py-8">אין מטרות להצגה.</p>
+      )}
     </div>
   );
 }
