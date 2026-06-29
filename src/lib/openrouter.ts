@@ -1,6 +1,7 @@
 import { z } from "zod";
 import type { AppState } from "./store";
 import { useStore } from "./store";
+import { findPlugin } from "@/plugins/registry";
 
 const ActionSchema = z.discriminatedUnion("type", [
   z.object({
@@ -45,13 +46,19 @@ export function buildSystemPrompt(state: AppState): string {
       ? `Recent user actions:\n${recentActions.map((a) => `- ${a.action}: ${a.description}`).join("\n")}`
       : "No recent user actions.";
 
+  let addendum = "";
+  if (state.active_plugin_id) {
+    const p = findPlugin(state.active_plugin_id);
+    if (p?.ai_prompt_addendum) addendum = `\n\nActive plugin context: ${p.ai_prompt_addendum}`;
+  }
+
   const snapshot = {
     objectives: state.objectives,
     tasks: state.tasks,
     decisions: state.decisions,
     advice: state.advice,
   };
-  return `${state.settings.system_prompt}
+  return `${state.settings.system_prompt}${addendum}
 
 User's Recent Activity:
 ${actionSummary}

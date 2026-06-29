@@ -1,31 +1,48 @@
 import { Link, useRouterState } from "@tanstack/react-router";
-import type { ReactNode } from "react";
-import { HardHat, MessageSquare, Target, GitBranch, Settings, Network } from "lucide-react";
+import { useState, type ReactNode } from "react";
+import {
+  Sparkles,
+  MessageSquare,
+  Target,
+  GitBranch,
+  Settings,
+  Network,
+  CalendarDays,
+  PieChart,
+  Puzzle,
+} from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ImportExportPanel } from "./ImportExportPanel";
 import { ThemeSwitcher, useApplyTheme } from "./ThemeSwitcher";
 import { ReturnButton } from "./ReturnButton";
+import { MantraOverlay, MantraChip, MantraFloatingButton } from "./MantraOverlay";
 
 const NAV = [
-  { to: "/copilot", label: "צ'אט פיקוח", icon: MessageSquare },
-  { to: "/graph", label: "מפת משימות", icon: Network },
-  { to: "/objectives", label: "מטרות ורצונות", icon: Target },
-  { to: "/decisions", label: "עץ החלטות", icon: GitBranch },
+  { to: "/copilot", label: "צ'אט", icon: MessageSquare },
+  { to: "/today", label: "היום", icon: CalendarDays },
+  { to: "/objectives", label: "מטרות", icon: Target },
+  { to: "/categories", label: "קטגוריות", icon: PieChart },
+  { to: "/graph", label: "מפה", icon: Network },
+  { to: "/decisions", label: "החלטות", icon: GitBranch },
+  { to: "/mantras", label: "מנטרות", icon: Sparkles },
+  { to: "/plugins", label: "תוספים", icon: Puzzle },
   { to: "/settings", label: "הגדרות", icon: Settings },
 ] as const;
 
 export function AppShell({ children }: { children: ReactNode }) {
   useApplyTheme();
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const [mantraOpen, setMantraOpen] = useState(false);
   return (
     <div dir="rtl" className="min-h-screen flex flex-col bg-background text-foreground">
       <header className="sticky top-0 z-20 border-b bg-card/80 backdrop-blur">
         <div className="flex items-center justify-between px-4 h-14 gap-4">
           <Link to="/copilot" className="flex items-center gap-2 font-extrabold text-lg">
-            <HardHat className="size-6 text-primary" />
-            <span>HomeBuild Co-Pilot</span>
+            <Sparkles className="size-6 text-primary" />
+            <span>Goal Co-Pilot</span>
           </Link>
           <div className="flex items-center gap-3">
+            <MantraChip onOpen={() => setMantraOpen(true)} />
             <ThemeSwitcher />
             <ImportExportPanel />
           </div>
@@ -58,9 +75,9 @@ export function AppShell({ children }: { children: ReactNode }) {
         </nav>
         <main className="flex-1 min-w-0 overflow-auto">{children}</main>
       </div>
-      {/* Mobile bottom nav */}
+      {/* Mobile bottom nav — first 5 items */}
       <nav className="md:hidden border-t bg-card grid grid-cols-5">
-        {NAV.map((n) => {
+        {NAV.slice(0, 5).map((n) => {
           const active = pathname.startsWith(n.to);
           const Icon = n.icon;
           return (
@@ -78,6 +95,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           );
         })}
       </nav>
+      <MantraFloatingButton onOpen={() => setMantraOpen(true)} />
+      <MantraOverlay open={mantraOpen} onClose={() => setMantraOpen(false)} />
       <ReturnButton />
     </div>
   );

@@ -9,21 +9,40 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TodayRouteImport } from './routes/today'
 import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as PluginsRouteImport } from './routes/plugins'
 import { Route as ObjectivesRouteImport } from './routes/objectives'
+import { Route as MantrasRouteImport } from './routes/mantras'
 import { Route as GraphRouteImport } from './routes/graph'
 import { Route as DecisionsRouteImport } from './routes/decisions'
 import { Route as CopilotRouteImport } from './routes/copilot'
+import { Route as CategoriesRouteImport } from './routes/categories'
 import { Route as IndexRouteImport } from './routes/index'
 
+const TodayRoute = TodayRouteImport.update({
+  id: '/today',
+  path: '/today',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PluginsRoute = PluginsRouteImport.update({
+  id: '/plugins',
+  path: '/plugins',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ObjectivesRoute = ObjectivesRouteImport.update({
   id: '/objectives',
   path: '/objectives',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MantrasRoute = MantrasRouteImport.update({
+  id: '/mantras',
+  path: '/mantras',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GraphRoute = GraphRouteImport.update({
@@ -41,6 +60,11 @@ const CopilotRoute = CopilotRouteImport.update({
   path: '/copilot',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CategoriesRoute = CategoriesRouteImport.update({
+  id: '/categories',
+  path: '/categories',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -49,61 +73,102 @@ const IndexRoute = IndexRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/categories': typeof CategoriesRoute
   '/copilot': typeof CopilotRoute
   '/decisions': typeof DecisionsRoute
   '/graph': typeof GraphRoute
+  '/mantras': typeof MantrasRoute
   '/objectives': typeof ObjectivesRoute
+  '/plugins': typeof PluginsRoute
   '/settings': typeof SettingsRoute
+  '/today': typeof TodayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/categories': typeof CategoriesRoute
   '/copilot': typeof CopilotRoute
   '/decisions': typeof DecisionsRoute
   '/graph': typeof GraphRoute
+  '/mantras': typeof MantrasRoute
   '/objectives': typeof ObjectivesRoute
+  '/plugins': typeof PluginsRoute
   '/settings': typeof SettingsRoute
+  '/today': typeof TodayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/categories': typeof CategoriesRoute
   '/copilot': typeof CopilotRoute
   '/decisions': typeof DecisionsRoute
   '/graph': typeof GraphRoute
+  '/mantras': typeof MantrasRoute
   '/objectives': typeof ObjectivesRoute
+  '/plugins': typeof PluginsRoute
   '/settings': typeof SettingsRoute
+  '/today': typeof TodayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/categories'
     | '/copilot'
     | '/decisions'
     | '/graph'
+    | '/mantras'
     | '/objectives'
+    | '/plugins'
     | '/settings'
+    | '/today'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/copilot' | '/decisions' | '/graph' | '/objectives' | '/settings'
+  to:
+    | '/'
+    | '/categories'
+    | '/copilot'
+    | '/decisions'
+    | '/graph'
+    | '/mantras'
+    | '/objectives'
+    | '/plugins'
+    | '/settings'
+    | '/today'
   id:
     | '__root__'
     | '/'
+    | '/categories'
     | '/copilot'
     | '/decisions'
     | '/graph'
+    | '/mantras'
     | '/objectives'
+    | '/plugins'
     | '/settings'
+    | '/today'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CategoriesRoute: typeof CategoriesRoute
   CopilotRoute: typeof CopilotRoute
   DecisionsRoute: typeof DecisionsRoute
   GraphRoute: typeof GraphRoute
+  MantrasRoute: typeof MantrasRoute
   ObjectivesRoute: typeof ObjectivesRoute
+  PluginsRoute: typeof PluginsRoute
   SettingsRoute: typeof SettingsRoute
+  TodayRoute: typeof TodayRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/today': {
+      id: '/today'
+      path: '/today'
+      fullPath: '/today'
+      preLoaderRoute: typeof TodayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -111,11 +176,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/plugins': {
+      id: '/plugins'
+      path: '/plugins'
+      fullPath: '/plugins'
+      preLoaderRoute: typeof PluginsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/objectives': {
       id: '/objectives'
       path: '/objectives'
       fullPath: '/objectives'
       preLoaderRoute: typeof ObjectivesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mantras': {
+      id: '/mantras'
+      path: '/mantras'
+      fullPath: '/mantras'
+      preLoaderRoute: typeof MantrasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/graph': {
@@ -139,6 +218,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CopilotRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/categories': {
+      id: '/categories'
+      path: '/categories'
+      fullPath: '/categories'
+      preLoaderRoute: typeof CategoriesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -151,22 +237,16 @@ declare module '@tanstack/react-router' {
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CategoriesRoute: CategoriesRoute,
   CopilotRoute: CopilotRoute,
   DecisionsRoute: DecisionsRoute,
   GraphRoute: GraphRoute,
+  MantrasRoute: MantrasRoute,
   ObjectivesRoute: ObjectivesRoute,
+  PluginsRoute: PluginsRoute,
   SettingsRoute: SettingsRoute,
+  TodayRoute: TodayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
