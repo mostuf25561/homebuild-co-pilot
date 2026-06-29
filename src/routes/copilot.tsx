@@ -87,7 +87,8 @@ function AlertsRail() {
               <Card
                 key={t.Task_ID}
                 id={`task-${t.Task_ID}`}
-                className={cn("p-3 space-y-2", overdue && "ring-1 ring-critical")}
+                className={cn("p-3 space-y-2 border-s-4", overdue && "ring-1 ring-critical", !t.color && "border-s-border")}
+                style={t.color ? { borderInlineStartColor: t.color } : undefined}
               >
                 <div className="flex items-start justify-between gap-2">
                   <PriorityBadge value={t.AI_Urgency_Level} />
