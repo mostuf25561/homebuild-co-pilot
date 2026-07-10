@@ -8,11 +8,12 @@ const IN = path.resolve(__dirname, "../out/demo.mp4");
 const PALETTE = path.resolve(__dirname, "../out/palette.png");
 const OUT = path.resolve(__dirname, "../out/demo.gif");
 
-const FPS = 10;
-const WIDTH = 720;
+const FPS = 8;
+const WIDTH = 560;
+const MAX_COLORS = 96;
 
 execSync(
-  `ffmpeg -y -i "${IN}" -vf "fps=${FPS},scale=${WIDTH}:-1:flags=lanczos,palettegen=stats_mode=diff" "${PALETTE}"`,
+  `ffmpeg -y -i "${IN}" -vf "fps=${FPS},scale=${WIDTH}:-1:flags=lanczos,palettegen=stats_mode=diff:max_colors=${MAX_COLORS}" "${PALETTE}"`,
   { stdio: "inherit" },
 );
 execSync(
